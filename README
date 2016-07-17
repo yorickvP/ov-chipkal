@@ -1,0 +1,20 @@
+This imports your OV-chipkaart transactions into google calendar!
+
+Steps to run:
+- npm install .
+- make a mijn-ov-chipkaart account and connect your ov-chipkaart.
+- make a calendar on google calendar and find it's id/email.
+
+- write settings.json:
+
+{
+	"calendarId": "thethingyoufound@group.calendar.google.com",
+	"tls": {
+		"username": "yourusername",
+		"password": "password"
+	}
+}
+
+- follow step one on https://developers.google.com/google-apps/calendar/quickstart/nodejs
+- set this up in cron/systemd-user.
+
