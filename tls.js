@@ -4,12 +4,6 @@ const OVApi = require("OVApi").default;
 
 const {Transform, Readable} = require('stream');
 
-const normalize_time = (t) => new Date((t / 1000 | 0) * 1000)
-const normalize_times = (data) => Object.assign(data, {
-	transactionDateTime: normalize_time(data.transactionDateTime)
-})
-
-
 
 function get_event_stream({username, password}, startDate, group_checkins, cb) {
 	const ov = new OVApi(username, password)
@@ -31,17 +25,15 @@ function get_transaction_list(api, mediumId, start = null) {
 		read(size) {
 			if (this.working) return;
 			this.working = true;
-			api._tlsRequest("transactions", Object.assign({
-				locale: "nl-NL", mediumId
-			}, this.nextRequestContext))
-			.then(({records, nextRequestContext}) => {
-				let contRead = false
-				records.forEach((data) => contRead = this.push(normalize_times(data)))
-				this.working = false;
-				this.nextRequestContext = nextRequestContext
-				if (records.some((e) => normalize_time(e.transactionDateTime) < start)) {
+			this.continuation()
+			.then(({records, continuation}) => {
+				let should_continue = false
+				records.forEach((data) => should_continue = this.push(data))
+				this.continuation = continuation
+				this.working = false
+				if (records.some((e) => e.transactionDateTime < start)) {
 					this.push(null);
-				} else if(contRead) {
+				} else if(should_continue) {
 					this._read()
 				}
 			})
@@ -50,7 +42,7 @@ function get_transaction_list(api, mediumId, start = null) {
 			})
 		}
 	});
-	myReadable.nextRequestContext = {};
+	myReadable.continuation = () => api.getTransactionsNRC(mediumId)
 	return myReadable;
 }
 
