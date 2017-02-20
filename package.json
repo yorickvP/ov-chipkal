@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "OVApi": "github:yorickvP/node-ov-api",
     "google-auth-library": "^0.9.8",
     "googleapis": "^11.0.0",
     "request": "^2.73.0"
