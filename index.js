@@ -32,7 +32,7 @@ gcal((calendar, auth) => {
         if (e.code != 'ENOENT') throw e;
         mtime = new Date(2016, 0);
     }
-    fs.appendFileSync("LAST_RUN", ""); // touch this file now
+    fs.utimesSync("LAST_RUN", Infinity, Infinity); // touch this file now
     console.log("downloading up to", mtime)
     tls_stream(settings.tls, mtime, true, (str) => {
         str.pipe(FnTransform(toGoogleCalendarEvent))
